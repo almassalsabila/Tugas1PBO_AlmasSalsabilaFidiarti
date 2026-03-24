@@ -51,40 +51,71 @@ Aplikasi ini menggunakan pola modular design dengan pemisahan tanggung jawab (se
 ### 3. Alur Eksekusi Program
 ```mermaid
 flowchart TD
-    Start([Input Data]) --> Input1["Input: ID Kelompok"]
-    Input1 --> Valid1{Input adalah<br/>angka?}
-    Valid1 -->|Tidak| Error1["❌ Error: Harus angka"]
-    Error1 --> Input1
-    Valid1 -->|Ya| Input2["Input: Nama Kelompok"]
+    Start([START]) --> Init["Initialize:<br/>Scanner input<br/>ArrayList daftarPresentasi"]
+    Init --> Display1["Display Main Menu:<br/>1. Tambah Data<br/>2. Tampilkan Data<br/>3. Ubah Status<br/>4. Keluar"]
+    Display1 --> Input{User memilih<br/>menu?}
     
-    Input2 --> Input3["Input: Ketua Kelompok"]
-    Input3 --> Input4["Input: Jumlah Anggota"]
-    Input4 --> Valid2{Input adalah<br/>angka?}
-    Valid2 -->|Tidak| Error2["❌ Error: Harus angka"]
-    Error2 --> Input4
-    Valid2 -->|Ya| Input5["Input: ID Presentasi"]
+    Input -->|Pilihan 1| Case1["CASE 1: Tambah Data Presentasi"]
+    Input -->|Pilihan 2| Case2["CASE 2: Tampilkan Semua Data"]
+    Input -->|Pilihan 3| Case3["CASE 3: Ubah Status Presentasi"]
+    Input -->|Pilihan 4| Exit1[END]
+    Input -->|Default| Invalid1["Invalid! Menu tidak ditemukan"]
+    Invalid1 --> Display1
     
-    Input5 --> Input6["Input: Topik Presentasi"]
-    Input6 --> Input7["Input: Tanggal Presentasi"]
-    Input7 --> Input8["Input: Jam Presentasi"]
-    Input8 --> Input9["Input: Ruangan"]
+    %% CASE 1: Tambah Data
+    Case1 --> Select{"Pilih Jenis<br/>Presentasi?"}
+    Select -->|Invalid| ErrType["Error: input tidak valid<br/>Pilih 1 atau 2"]
+    ErrType --> Select
+    Select -->|1. Offline| Offline["Presentasi Offline"]
+    Select -->|2. Online| Online["Presentasi Online"]
     
-    Input9 --> JenisCheck{Jenis<br/>Presentasi?}
-    JenisCheck -->|Offline| CreateOffline["✅ Create Presentasi"]
-    JenisCheck -->|Online| InputPlatform["Input: Platform"]
+    %% Offline Path
+    Offline --> InputKel1["Input Kelompok:<br/>- ID Kelompok<br/>- Nama Kelompok<br/>- Ketua Kelompok<br/>- Jumlah Anggota"]
+    InputKel1 --> InputPres1["Input Presentasi:<br/>- ID Presentasi<br/>- Topik Presentasi<br/>- Tanggal<br/>- Jam<br/>- Ruangan"]
+    InputPres1 --> CreateObj1["Create:<br/>Kelompok obj<br/>JadwalPresentasi obj<br/>Presentasi obj"]
+    CreateObj1 --> Add1["Add ke ArrayList"]
+    Add1 --> Back1["Kembali ke Menu Utama"]
+    Back1 --> Display1
     
-    InputPlatform --> InputLink["Input: Link Meeting"]
-    InputLink --> CreateOnline["✅ Create PresentasiOnline"]
+    %% Online Path
+    Online --> InputKel2["Input Kelompok:<br/>- ID Kelompok<br/>- Nama Kelompok<br/>- Ketua Kelompok<br/>- Jumlah Anggota"]
+    InputKel2 --> InputPres2["Input Presentasi:<br/>- ID Presentasi<br/>- Topik Presentasi<br/>- Tanggal<br/>- Jam<br/>- Ruangan"]
+    InputPres2 --> InputOnline["Input Online:<br/>- Platform<br/>- Link Meeting"]
+    InputOnline --> CreateObj2["Create:<br/>Kelompok obj<br/>JadwalPresentasi obj<br/>PresentasiOnline obj"]
+    CreateObj2 --> Add2["Add ke ArrayList"]
+    Add2 --> Back2["Kembali ke Menu Utama"]
+    Back2 --> Display1
     
-    CreateOffline --> Save["Save ke ArrayList"]
-    CreateOnline --> Save
-    Save --> Complete([✅ Data Berhasil Disimpan])
+    %% CASE 2: Tampilkan Data
+    Case2 --> Check{ArrayList<br/>kosong?}
+    Check -->|Ya| Empty["Display:<br/>Tidak ada data presentasi"]
+    Check -->|Tidak| Loop["Loop untuk setiap element<br/>di ArrayList"]
+    Empty --> Back3["Kembali ke Menu Utama"]
+    Loop --> Display2["Call method:<br/>tampilPresentasi()"]
+    Display2 --> Back3
+    Back3 --> Display1
     
-    style Error1 fill:#FFB6C6
-    style Error2 fill:#FFB6C6
-    style Complete fill:#90EE90
-    style CreateOffline fill:#87CEEB
-    style CreateOnline fill:#87CEEB
+    %% CASE 3: Ubah Status
+    Case3 --> InputID["Input ID Presentasi<br/>yang ingin diubah"]
+    InputID --> Find{Presentasi<br/>ditemukan?}
+    Find -->|Tidak| NotFound["Error: Presentasi<br/>tidak ditemukan"]
+    Find -->|Ya| ShowStatus["Display:<br/>Status saat ini"]
+    NotFound --> Back4["Kembali ke Menu Utama"]
+    ShowStatus --> StatusOpt["Pilih Status Baru:<br/>1. Terjadwal<br/>2. Selesai<br/>3. Batal"]
+    StatusOpt --> SetStatus["Call method:<br/>setStatus()"]
+    SetStatus --> Back4
+    Back4 --> Display1
+    
+    Exit1 --> EndProgram([Program Berakhir])
+    
+    style Start fill:#90EE90
+    style EndProgram fill:#FFB6C6
+    style Display1 fill:#87CEEB
+    style Case1 fill:#FFE4B5
+    style Case2 fill:#FFE4B5
+    style Case3 fill:#FFE4B5
+    style Offline fill:#DDA0DD
+    style Online fill:#DDA0DD
 ```
 ---
 
